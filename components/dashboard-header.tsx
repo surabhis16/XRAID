@@ -28,7 +28,7 @@ export function DashboardHeader({ onMenuClick }: { onMenuClick: () => void }) {
             <Bell className="w-6 h-6" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full pulse-green" />
           </button>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 flex items-center justify-center font-bold cursor-pointer">
+          <div className="w-10 h-10 rounded-full bg-linear-to-r from-emerald-500 to-cyan-500 flex items-center justify-center font-bold cursor-pointer">
             SA
           </div>
         </div>
