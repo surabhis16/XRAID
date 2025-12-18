@@ -13,144 +13,134 @@ export default function LandingPage() {
     offset: ["start start", "end start"],
   })
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"])
+  const opacity = useTransform(scrollYProgress, [0, 0.4], [1, 0])
+  const scale = useTransform(scrollYProgress, [0, 0.4], [1, 0.98])
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-background text-foreground">
+    <div ref={containerRef} className="min-h-screen bg-background text-foreground selection:bg-primary/30">
       <LandingHeader />
 
       {/* Hero Section */}
       <motion.section
-        className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
+        className="relative min-h-[95vh] flex flex-col items-center justify-center overflow-hidden pt-32 pb-20 px-4"
         style={{ opacity }}
       >
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(20)].map((_, i) => (
+        {/* Background Effects */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.12),transparent_70%)]" />
+          <div
+            className="absolute inset-0 opacity-[0.1]"
+            style={{
+              backgroundImage: `linear-gradient(#3b82f6 1px, transparent 1px), linear-gradient(90deg, #3b82f6 1px, transparent 1px)`,
+              backgroundSize: '48px 48px',
+              maskImage: 'radial-gradient(ellipse at center, black, transparent 80%)'
+            }}
+          />
+          {[...Array(12)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-2 h-2 bg-primary/30 rounded-full"
-              animate={{
-                x: [
-                  Math.random() * (typeof window !== "undefined" ? window.innerWidth : 1000),
-                  Math.random() * (typeof window !== "undefined" ? window.innerWidth : 1000),
-                ],
-                y: [
-                  Math.random() * (typeof window !== "undefined" ? window.innerHeight : 1000),
-                  Math.random() * (typeof window !== "undefined" ? window.innerHeight : 1000),
-                ],
-              }}
-              transition={{
-                duration: Math.random() * 10 + 10,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "linear",
-              }}
+              className="absolute w-1 h-1 bg-primary/40 rounded-full"
+              animate={{ y: [0, -120, 0], opacity: [0, 0.8, 0] }}
+              transition={{ duration: Math.random() * 6 + 4, repeat: Infinity, delay: Math.random() * 5 }}
+              style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
             />
           ))}
         </div>
 
-        <motion.div style={{ y }} className="relative z-10 text-center px-4 max-w-6xl mx-auto">
+        <motion.div style={{ y, scale }} className="relative z-10 text-center max-w-5xl mx-auto">
+          {/* Status Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase mb-10"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            Next-Gen AI Security
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="mb-6"
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1 className="text-6xl md:text-8xl font-bold mb-4 text-primary">XRAID</h1>
-            <p className="text-xl md:text-2xl text-secondary font-semibold tracking-wide">Trust Through Transparency</p>
+            <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter leading-none mb-2 bg-clip-text text-transparent bg-linear-to-b from-foreground to-foreground/40">
+              XRAID
+            </h1>
+            <p className="text-primary font-mono text-sm md:text-base tracking-[0.4em] uppercase mb-12">
+              Trust Through Transparency
+            </p>
           </motion.div>
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl md:text-6xl font-bold mb-6 text-balance"
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-4xl md:text-6xl font-bold mb-8 tracking-tight text-balance leading-tight"
           >
-            Stop Trusting <span className="text-accent">Black-Box Security</span>
+            Stop Trusting <span className="text-primary italic">Black-Box</span> Security
           </motion.h2>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto text-balance"
+            className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
           >
-            See exactly why every threat was flagged - powered by explainable AI
+            See exactly why every threat was flagged. Powered by explainable AI to give you clear evidence in sub-100ms.
           </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="mb-12"
-          >
-            <Counter value={99.54} suffix="%" label="Detection Accuracy" />
-          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="flex flex-col sm:flex-row gap-5 justify-center items-center"
           >
             <Link href="/dashboard">
-              <button className="group px-8 py-4 bg-primary text-white rounded-lg font-semibold text-lg hover:scale-105 transition-transform duration-200 glow-hover flex items-center gap-2">
+              <button className="px-10 py-4 bg-primary text-primary-foreground rounded-full font-bold text-lg hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all flex items-center gap-2 group">
                 View Live Demo
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
-            <button className="px-8 py-4 glass rounded-lg font-semibold text-lg hover:scale-105 transition-transform duration-200">
-              See How It Works
+            <button className="px-10 py-4 bg-secondary/10 border border-white/10 backdrop-blur-md rounded-full font-bold text-lg hover:bg-secondary/20 transition-all">
+              Documentation
             </button>
-          </motion.div>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-            className="w-6 h-10 border-2 border-muted-foreground rounded-full flex justify-center p-2"
-          >
-            <div className="w-1 h-2 bg-muted-foreground rounded-full" />
           </motion.div>
         </motion.div>
       </motion.section>
 
       {/* Features Grid */}
-      <section className="py-24 px-4 relative">
+      <section className="py-32 px-4 relative">
         <div className="max-w-7xl mx-auto">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold text-center mb-16"
+            className="text-4xl md:text-5xl font-black text-center mb-20 tracking-tight"
           >
             Why Choose XRAID?
           </motion.h2>
 
           <div className="grid md:grid-cols-3 gap-8">
             <FeatureCard
-              icon={<Brain className="w-12 h-12" />}
+              icon={<Brain />}
               title="Adaptive Ensemble"
-              description="Random Forest + Isolation Forest + Autoencoder fusion with confidence scoring for unparalleled accuracy"
+              description="Random Forest + Isolation Forest + Autoencoder fusion with confidence scoring for unparalleled accuracy."
               delay={0}
             />
             <FeatureCard
-              icon={<Lightbulb className="w-12 h-12" />}
+              icon={<Lightbulb />}
               title="SHAP Explanations"
-              description="See top 5 features driving each detection with clear, actionable insights"
+              description="See the top 5 features driving each detection with clear, actionable insights for every alert."
               delay={0.1}
             />
             <FeatureCard
-              icon={<Zap className="w-12 h-12" />}
+              icon={<Zap />}
               title="Real-Time Detection"
-              description="Instant predictions on network flows with sub-100ms response times"
+              description="Instant predictions on high-velocity network flows with sub-100ms response times at scale."
               delay={0.2}
             />
           </div>
@@ -158,79 +148,75 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-24 px-4 bg-card">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-32 px-4 bg-secondary/5 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto relative z-10">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold text-center mb-16"
+            className="text-4xl md:text-5xl font-black text-center mb-24 tracking-tight"
           >
             How It Works
           </motion.h2>
 
-          <div className="grid md:grid-cols-4 gap-8 relative">
-            <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-primary -translate-y-1/2" />
+          <div className="grid md:grid-cols-4 gap-12 relative">
+            <div className="hidden md:block absolute top-10 left-[10%] right-[10%] h-0.5 bg-linear-to-r from-transparent via-primary/30 to-transparent" />
+            <TimelineStep
+              icon={<Database className="w-8 h-8" />}
+              title="Upload"
+              description="Submit network flow data"
+              step={1}
+            />
 
-            <TimelineStep icon={<Database />} title="Upload" description="Submit network flow data" step={1} />
-            <TimelineStep icon={<Target />} title="Detect" description="AI models analyze patterns" step={2} />
-            <TimelineStep icon={<Lightbulb />} title="Explain" description="SHAP reveals why" step={3} />
-            <TimelineStep icon={<Shield />} title="Act" description="Make informed decisions" step={4} />
+            <TimelineStep
+              icon={<Target className="w-8 h-8" />}
+              title="Detect"
+              description="AI models analyze patterns"
+              step={2}
+            />
+
+            <TimelineStep
+              icon={<Lightbulb className="w-8 h-8" />}
+              title="Explain"
+              description="SHAP reveals the 'Why'"
+              step={3}
+            />
+
+            <TimelineStep
+              icon={<Shield className="w-8 h-8" />}
+              title="Act"
+              description="Make informed decisions"
+              step={4}
+            />
+
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-24 px-4">
+      <section className="py-32 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <StatCard value={3} label="AI Models" sublabel="RF, IF, AE" />
-            <StatCard value={5} label="Attack Types" sublabel="DoS, DDoS, PortScan, Botnet" />
+            <StatCard value={5} label="Attack Types" sublabel="DDoS to PortScan" />
             <StatCard value={78} label="Features" sublabel="Analyzed per flow" />
-            <StatCard value={100} label="Average ms" sublabel="Detection time" suffix="<" />
+            <StatCard value={100} label="Latency" sublabel="Average ms" suffix="<" />
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 border-t border-border">
-        <div className="max-w-7xl mx-auto text-center text-muted-foreground">
-          <p className="text-sm">© 2025 XRAID. Built for security analysts who demand transparency.</p>
+      <footer className="py-16 px-4 border-t border-white/5 bg-background">
+        <div className="max-w-7xl mx-auto flex flex-col items-center gap-6 text-center">
+          <div className="text-2xl font-black tracking-tighter">XRAID</div>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            Built for security analysts who demand transparency in AI.
+          </p>
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground/50">
+            © 2025 XRAID SEC-INTEL
+          </div>
         </div>
       </footer>
-    </div>
-  )
-}
-
-function Counter({ value, suffix = "", label }: { value: number; suffix?: string; label: string }) {
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    const duration = 2000
-    const steps = 60
-    const increment = value / steps
-    let current = 0
-
-    const timer = setInterval(() => {
-      current += increment
-      if (current >= value) {
-        setCount(value)
-        clearInterval(timer)
-      } else {
-        setCount(current)
-      }
-    }, duration / steps)
-
-    return () => clearInterval(timer)
-  }, [value])
-
-  return (
-    <div className="inline-block">
-      <div className="text-6xl md:text-7xl font-bold text-primary">
-        {count.toFixed(2)}
-        {suffix}
-      </div>
-      <div className="text-lg text-muted-foreground mt-2">{label}</div>
     </div>
   )
 }
@@ -242,12 +228,14 @@ function FeatureCard({ icon, title, description, delay }: any) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay }}
-      whileHover={{ scale: 1.05, y: -5 }}
-      className="glass rounded-xl p-8 hover:glow transition-all duration-300 cursor-pointer scan-line"
+      whileHover={{ y: -8 }}
+      className="p-8 rounded-3xl bg-secondary/5 border border-white/10 hover:border-primary/50 hover:bg-primary/2 transition-all duration-500 group"
     >
-      <div className="mb-4 text-primary">{icon}</div>
-      <h3 className="text-2xl font-bold mb-3">{title}</h3>
-      <p className="text-muted-foreground leading-relaxed">{description}</p>
+      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform duration-500">
+        {icon}
+      </div>
+      <h3 className="text-2xl font-bold mb-4">{title}</h3>
+      <p className="text-muted-foreground leading-relaxed text-sm md:text-base">{description}</p>
     </motion.div>
   )
 }
@@ -255,17 +243,18 @@ function FeatureCard({ icon, title, description, delay }: any) {
 function TimelineStep({ icon, title, description, step }: any) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      whileInView={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: step * 0.1 }}
-      className="relative z-10 text-center"
+      className="relative z-10 flex flex-col items-center text-center"
     >
-      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center glow">
-        <div className="text-white">{icon}</div>
+      <div className="w-20 h-20 rounded-full bg-background border-2 border-primary/20 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(59,130,246,0.1)] group hover:border-primary transition-colors">
+        <div className="text-primary w-8 h-8 group-hover:scale-110 transition-transform">{icon}</div>
       </div>
+      <div className="text-xs font-bold text-primary mb-2 uppercase tracking-widest">Step 0{step}</div>
       <h3 className="text-xl font-bold mb-2">{title}</h3>
-      <p className="text-muted-foreground text-sm">{description}</p>
+      <p className="text-muted-foreground text-sm leading-relaxed max-w-37.5">{description}</p>
     </motion.div>
   )
 }
@@ -278,10 +267,9 @@ function StatCard({ value, label, sublabel, suffix = "" }: any) {
     if (!hasAnimated) {
       setHasAnimated(true)
       const duration = 2000
-      const steps = 60
+      const steps = 40
       const increment = value / steps
       let current = 0
-
       const timer = setInterval(() => {
         current += increment
         if (current >= value) {
@@ -296,18 +284,33 @@ function StatCard({ value, label, sublabel, suffix = "" }: any) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       onViewportEnter={handleInView}
-      className="glass rounded-xl p-8 text-center hover:glow-hover transition-all duration-300"
+      className="
+        p-14
+        min-h-60
+        rounded-[2.25rem]
+        bg-secondary/5
+        border border-white/10
+        text-center
+        hover:bg-secondary/10
+        transition-all
+        duration-300
+      "
     >
-      <div className="text-5xl font-bold text-primary mb-2">
-        {suffix}
-        {count}
+      <div className="text-6xl md:text-6xl font-black text-primary mb-4 tabular-nums">
+        {suffix}{count}
       </div>
-      <div className="text-xl font-semibold mb-1">{label}</div>
-      <div className="text-sm text-muted-foreground">{sublabel}</div>
+
+      <div className="text-base md:text-lg font-extrabold mb-2 uppercase tracking-wide">
+        {label}
+      </div>
+
+      <div className="text-sm md:text-base text-muted-foreground font-medium">
+        {sublabel}
+      </div>
     </motion.div>
   )
 }
