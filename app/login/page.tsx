@@ -82,7 +82,6 @@ export default function LoginPage() {
               </div>
             </motion.div>
 
-            {/* CHANGED: Forced text-white for the branding */}
             <h1 className="text-4xl font-black tracking-tighter text-white mb-2">XRAID</h1>
             <div className="flex items-center justify-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -93,7 +92,6 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              {/* CHANGED: Label text color adjusted for dark card */}
               <label className="block text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-2 ml-1 font-bold">Identity</label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary transition-colors" />
@@ -101,7 +99,6 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  // CHANGED: Forced dark input background and subtle border
                   className="w-full pl-12 pr-4 py-4 bg-black/40 border border-white/5 rounded-2xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm font-medium placeholder:text-slate-600 text-white"
                   placeholder="analyst@xraid.io"
                   required
@@ -117,7 +114,6 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  // CHANGED: Forced dark input background and subtle border
                   className="w-full pl-12 pr-12 py-4 bg-black/40 border border-white/5 rounded-2xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm font-medium placeholder:text-slate-600 text-white"
                   placeholder="••••••••"
                   required
@@ -141,7 +137,6 @@ export default function LoginPage() {
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="peer sr-only"
                   />
-                  {/* CHANGED: Adjusted checkbox background for dark card */}
                   <div className="w-4 h-4 border border-white/20 rounded bg-black/40 peer-checked:bg-primary peer-checked:border-primary transition-all" />
                   <div className="absolute inset-0 flex items-center justify-center text-white opacity-0 peer-checked:opacity-100 transition-all">
                     <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
@@ -170,7 +165,6 @@ export default function LoginPage() {
               onClick={handleDemoMode}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
-              // CHANGED: Background to white/5 to pop against the dark card
               className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-xs uppercase tracking-[0.2em] text-slate-300 hover:bg-white/10 transition-all"
             >
               Sandbox Access

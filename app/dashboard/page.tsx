@@ -8,8 +8,6 @@ import {
   Upload,
   Settings,
   X,
-  TrendingUp,
-  TrendingDown,
   Shield,
   Activity,
   Eye,
@@ -35,7 +33,7 @@ const recentAlerts = [
   { id: 2, time: "5 min ago", type: "PortScan", confidence: 87, status: "warning" },
   { id: 3, time: "8 min ago", type: "DoS", confidence: 94, status: "critical" },
   { id: 4, time: "12 min ago", type: "Botnet", confidence: 78, status: "warning" },
-  { id: 5, time: "15 min ago", type: "DDoS", confidence: 92, status: "critical" },
+  { id: 5, time: "15 min ago", type: "Brute Force", confidence: 92, status: "critical" },
 ]
 
 const activityFeed = [
@@ -250,7 +248,6 @@ function AlertModal({ alert, onClose }: { alert: any; onClose: () => void }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        // CHANGED: Forced dark backdrop
         className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
         onClick={onClose}
       >
@@ -258,7 +255,6 @@ function AlertModal({ alert, onClose }: { alert: any; onClose: () => void }) {
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          // CHANGED: Main container background to dark, border to subtle white, forced light text
           className="bg-[#0a0f1e] border border-white/10 rounded-2xl p-8 max-w-4xl w-full my-8 shadow-2xl modal-scroll text-slate-100"
           style={{
             maxHeight: 'calc(100vh - 4rem)',
