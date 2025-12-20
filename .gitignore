@@ -1,5 +1,5 @@
-/node_modules
-/.next/
+node_modules/
+.next/
 /out/
 
 /build
@@ -13,3 +13,7 @@ yarn-error.log*
 
 *.tsbuildinfo
 next-env.d.ts
+
+*.pkl
+*.keras
+backend/models/
