@@ -17,3 +17,13 @@ next-env.d.ts
 *.pkl
 *.keras
 backend/models/
+venv/
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+*.db
+
+.vscode/
