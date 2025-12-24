@@ -46,8 +46,20 @@ class ModelManager:
             
             self.shap_explainer = shap.TreeExplainer(self.rf_binary)
             
+            # for debugging
+            print("MODEL INFORMATION")
+            print(f"Binary RF Model: {type(self.rf_binary).__name__}")
+            print(f"Multiclass RF Model: {type(self.rf_multiclass).__name__}")
+            print(f"Feature count: {len(self.feature_names)}")
+            print(f"AE threshold: {self.ae_threshold:.6f}")
+            
+            # Show attack types the model knows
+            print(f"\nKnown Attack Types ({len(self.label_encoder.classes_)}):")
+            for i, attack_type in enumerate(self.label_encoder.classes_):
+                print(f"   {i}: {attack_type}")
+            
             self.models_loaded = True
-            print("All models loaded successfully")
+            print("All models loaded successfully\n")
             
         except Exception as e:
             print(f"Error loading models: {e}")

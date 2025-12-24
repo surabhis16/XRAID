@@ -1,6 +1,4 @@
-"""
-SHAP explanation utilities for XRAID
-"""
+# SHAP explanation utilities 
 import numpy as np
 from typing import Dict, Any
 from app.utils.model_loader import model_manager
@@ -38,11 +36,23 @@ def predict_with_ensemble(features: np.ndarray) -> Dict[str, Any]:
     
     is_attack = int(rf_if_agree_anomaly or rf_very_confident or ae_confident_detection)
     
-    # Multi-class prediction
-    attack_type_encoded = model_manager.rf_multiclass.predict(features)[0]
-    attack_type_proba = model_manager.rf_multiclass.predict_proba(features)[0]
-    attack_type = model_manager.label_encoder.inverse_transform([attack_type_encoded])[0]
-    type_confidence = float(attack_type_proba[attack_type_encoded])
+    # Multi-class prediction (only if attack detected)
+    attack_type = 'Benign'
+    type_confidence = 0.0
+    
+    if is_attack == 1:
+        attack_type_encoded = model_manager.rf_multiclass.predict(features)[0]
+        attack_type_proba = model_manager.rf_multiclass.predict_proba(features)[0]
+        attack_type = model_manager.label_encoder.inverse_transform([attack_type_encoded])[0]
+        type_confidence = float(attack_type_proba[attack_type_encoded])
+        
+        # Debug prediction with all probabilities
+        print(f"      Binary: {rf_pred}, RF Proba: {rf_proba:.3f}, ISO: {iso_pred_binary}, AE: {ae_pred_binary}")
+        print(f"      Predicted Attack Type: {attack_type} (confidence: {type_confidence:.3f})")
+        print(f"      All class probabilities:")
+        for i, (cls, prob) in enumerate(zip(model_manager.label_encoder.classes_, attack_type_proba)):
+            if prob > 0.01:  # Only show if >1% probability
+                print(f"         {cls}: {prob:.3f}")
     
     # Final result
     if is_attack == 1 and attack_type != 'Benign':
@@ -50,7 +60,7 @@ def predict_with_ensemble(features: np.ndarray) -> Dict[str, Any]:
         final_confidence = float(min(rf_proba, type_confidence))
     else:
         final_prediction = 'Benign'
-        final_confidence = float(1.0 - rf_proba)
+        final_confidence = float(1.0 - rf_proba) if is_attack == 0 else type_confidence
     
     return {
         'prediction': 'Attack' if is_attack == 1 else 'Benign',
@@ -65,50 +75,101 @@ def predict_with_ensemble(features: np.ndarray) -> Dict[str, Any]:
 
 def generate_shap_explanation(features: np.ndarray, prediction_result: Dict) -> Dict[str, Any]:
     """Generate SHAP explanation for prediction"""
-    # Get SHAP values
-    shap_values = model_manager.shap_explainer.shap_values(features)
-    
-    # For binary classifier, shap_values is a list [class_0_values, class_1_values]
-    # We want class 1 (attack) values
-    if isinstance(shap_values, list):
-        shap_values_attack = shap_values[1][0]  # Attack class, first sample
-    else:
-        shap_values_attack = shap_values[0]
-    
-    # Get feature values
-    feature_values = features[0]
-    
-    # Create feature importance list
-    feature_importance = []
-    for i, (shap_val, feat_val, feat_name) in enumerate(zip(
-        shap_values_attack, feature_values, model_manager.feature_names
-    )):
-        feature_importance.append({
-            'feature': feat_name,
-            'shap_value': float(shap_val),
-            'feature_value': float(feat_val),
-            'abs_shap': abs(float(shap_val))
-        })
-    
-    # Sort by absolute SHAP value
-    feature_importance.sort(key=lambda x: x['abs_shap'], reverse=True)
-    
-    # Get top 5 features
-    top_features = feature_importance[:5]
-    
-    # Generate plain-English summary
-    if prediction_result['is_attack']:
-        top_feature = top_features[0]
-        summary = f"Flagged as {prediction_result['attack_type']} due to "
-        summary += f"abnormal {top_feature['feature']} "
-        summary += f"(value: {top_feature['feature_value']:.2f}, "
-        summary += f"SHAP contribution: {top_feature['shap_value']:+.3f})"
-    else:
-        summary = f"Classified as Benign. Network flow characteristics within normal ranges."
-    
-    return {
-        'shap_values': [float(v) for v in shap_values_attack],
-        'top_features': top_features,
-        'summary': summary,
-        'feature_names': model_manager.feature_names
-    }
+    try:
+        # Get SHAP values
+        shap_values = model_manager.shap_explainer.shap_values(features)
+        
+        # Handle different SHAP output formats
+        if isinstance(shap_values, list):
+            # Binary classifier returns [class_0_values, class_1_values]
+            # We want class 1 (attack) values
+            shap_values_attack = shap_values[1]
+            if len(shap_values_attack.shape) > 1:
+                shap_values_attack = shap_values_attack[0]  # Get first sample
+        else:
+            # Single array output
+            if len(shap_values.shape) > 1:
+                shap_values_attack = shap_values[0]
+            else:
+                shap_values_attack = shap_values
+        
+        # Ensure 1D array and correct length
+        shap_values_attack = np.array(shap_values_attack).flatten()
+        
+        # If SHAP values are doubled (concatenated for binary classes), take first half
+        expected_len = len(model_manager.feature_names)
+        if len(shap_values_attack) == expected_len * 2:
+            print(f"SHAP values doubled ({len(shap_values_attack)}), taking attack class values (first {expected_len})")
+            shap_values_attack = shap_values_attack[:expected_len]
+        elif len(shap_values_attack) != expected_len:
+            print(f"SHAP length mismatch: {len(shap_values_attack)} != {expected_len}, truncating")
+            shap_values_attack = shap_values_attack[:expected_len]
+        
+        # Get feature values
+        feature_values = np.array(features[0]).flatten()
+        
+        # Ensure matching lengths
+        min_len = min(len(shap_values_attack), len(feature_values), len(model_manager.feature_names))
+        shap_values_attack = shap_values_attack[:min_len]
+        feature_values = feature_values[:min_len]
+        feature_names = model_manager.feature_names[:min_len]
+        
+        # Create feature importance list
+        feature_importance = []
+        for shap_val, feat_val, feat_name in zip(shap_values_attack, feature_values, feature_names):
+            # Convert to scalar
+            shap_scalar = float(np.asarray(shap_val).item())
+            feat_scalar = float(np.asarray(feat_val).item())
+            
+            feature_importance.append({
+                'feature': feat_name,
+                'shap_value': shap_scalar,
+                'feature_value': feat_scalar,
+                'abs_shap': abs(shap_scalar)
+            })
+        
+        # Sort by absolute SHAP value
+        feature_importance.sort(key=lambda x: x['abs_shap'], reverse=True)
+        
+        # Get top 5 features
+        top_features = feature_importance[:5]
+        
+        # Generate summary
+        if prediction_result['is_attack']:
+            top_feature = top_features[0]
+            summary = f"Flagged as {prediction_result['attack_type']} due to "
+            summary += f"abnormal {top_feature['feature']} "
+            summary += f"(value: {top_feature['feature_value']:.2f}, "
+            summary += f"SHAP contribution: {top_feature['shap_value']:+.3f})"
+        else:
+            summary = f"Classified as Benign. Network flow characteristics within normal ranges."
+        
+        # Convert to list of scalars
+        shap_values_list = [float(np.asarray(v).item()) for v in shap_values_attack]
+        
+        return {
+            'shap_values': shap_values_list,
+            'top_features': top_features,
+            'summary': summary,
+            'feature_names': list(feature_names)
+        }
+        
+    except Exception as e:
+        print(f"Error in generate_shap_explanation: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        # Return fallback
+        return {
+            'shap_values': [0.0] * len(model_manager.feature_names),
+            'top_features': [
+                {
+                    'feature': model_manager.feature_names[0],
+                    'shap_value': 0.0,
+                    'feature_value': 0.0,
+                    'abs_shap': 0.0
+                }
+            ],
+            'summary': f"Prediction: {prediction_result['attack_type']} (SHAP explanation unavailable)",
+            'feature_names': model_manager.feature_names
+        }

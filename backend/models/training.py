@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 import tensorflow as tf
-from tensorflow.keras.models import Model
+from tensortflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense, Dropout, BatchNormalization
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
@@ -41,38 +41,79 @@ print(f"\nOriginal label distribution:")
 print(data['Label'].value_counts())
 
 
-# Map attack types to categories (useful for multi-class classification later)
 print("\nMapping attack types to main categories...")
 
+# Map labels from CICIDS2017 dataset (spacing v imp, shud be exact)
 attack_type_mapping = {
     'BENIGN': 'Benign',
-    'PortScan': 'PortScan',
-    'Web Attack � Brute Force': 'WebAttack',
-    'Web Attack � XSS': 'WebAttack',
-    'Web Attack � Sql Injection': 'WebAttack',
-    'FTP-Patator': 'BruteForce',
-    'SSH-Patator': 'BruteForce',
-    'DDoS': 'DDoS',
-    'Bot': 'Botnet',
-    'Infiltration': 'Infiltration',
-    'DoS slowloris': 'DoS',
-    'DoS Slowhttptest': 'DoS',
-    'DoS Hulk': 'DoS',
-    'DoS GoldenEye': 'DoS',
-    'Heartbleed': 'Exploit'
+    
+    # DoS attacks (not distributed)
+    'DOS HULK': 'DoS',
+    'DOS GOLDENEYE': 'DoS',
+    'DOS SLOWLORIS': 'DoS',
+    'DOS SLOWHTTPTEST': 'DoS',
+    
+    # DDoS (distributed)
+    'DDOS': 'DDoS',
+    
+    # Port scanning
+    'PORTSCAN': 'PortScan',
+    
+    # Brute force / Password attacks
+    'FTP-PATATOR': 'BruteForce',
+    'SSH-PATATOR': 'BruteForce',
+    
+    # Web attacks 
+    'WEB ATTACK � BRUTE FORCE': 'WebAttack',
+    'WEB ATTACK � XSS': 'WebAttack',
+    'WEB ATTACK � SQL INJECTION': 'WebAttack',
+    
+    # Bot / Botnet
+    'BOT': 'Botnet',
+    
+    # Infiltration
+    'INFILTRATION': 'Infiltration',
+    
+    # Exploits
+    'HEARTBLEED': 'Exploit'
 }
 
 # Apply mapping
 data['AttackType'] = data['Label'].map(attack_type_mapping)
-data['AttackType'] = data['AttackType'].fillna('Other')
 
-print(f"\nConsolidated attack type distribution:")
-print(data['AttackType'].value_counts())
+# Check for unmapped labels
+unmapped = data[data['AttackType'].isna()]['Label'].unique()
+if len(unmapped) > 0:
+    print(f"\n WARNING: Found {len(unmapped)} unmapped labels:")
+    for label in unmapped:
+        count = (data['Label'] == label).sum()
+        print(f"  '{label}': {count:,} samples")
+    
+    # Fill unmapped as 'Other'
+    data['AttackType'] = data['AttackType'].fillna('Other')
+else:
+    print("All labels mapped successfully!")
 
-# Create binary label (for binary models)
+print(f"\n Consolidated attack type distribution:")
+attack_counts = data['AttackType'].value_counts()
+for attack_type, count in attack_counts.items():
+    print(f"  {attack_type}: {count:,} ({count/len(data)*100:.2f}%)")
+
+# Verify we have multiple attack types
+unique_attacks = data['AttackType'].nunique()
+print(f"\nTotal unique attack types: {unique_attacks}")
+
+if unique_attacks <= 2:
+    print("\n ERROR: Only got Benign and Other/one attack type!")
+    print("   Check the mapping above - labels might not match exactly")
+    raise ValueError(f"Expected 8+ attack types, got {unique_attacks}")
+
+# Create binary label
 data['IsMalicious'] = (data['AttackType'] != 'Benign').astype(int)
 
-print(f"\nBinary distribution: {data['IsMalicious'].value_counts()}")
+print(f"\n Binary distribution:")
+print(f"  Benign: {(data['IsMalicious'] == 0).sum():,}")
+print(f"  Malicious: {(data['IsMalicious'] == 1).sum():,}")
 
 
 # Prepare features
@@ -265,7 +306,7 @@ binary_accuracy = accuracy_score(y_test_binary, ensemble_pred)
 print(f"Binary Accuracy: {binary_accuracy:.4f}")
 
 
-# Train Multi-Class Classifier (for identifying specific attacks)=
+# Train Multi-Class Classifier (for identifying specific attacks)
 print("[4/4] Multi Class Attack Type Classifier :")
 
 rf_multiclass = RandomForestClassifier(
@@ -283,7 +324,7 @@ rf_multiclass.fit(X_train, y_train_multi)
 y_pred_multi = rf_multiclass.predict(X_test)
 y_pred_multi_proba = rf_multiclass.predict_proba(X_test)
 
-print("\n✓ Multi-Class Classifier trained")
+print("\nMulti-Class Classifier trained")
 print("\nMulti-Class Classification Report:")
 print(classification_report(
     y_test_multi, 
@@ -373,7 +414,7 @@ def predict_network_flow(flow_features, return_details=False):
     Returns:
         dict with prediction results
     """
-    # Load models (cache these in production)
+    # Load models (cache in production)
     rf_binary = joblib.load('models/rf_model.pkl')
     iso_forest = joblib.load('models/iso_forest.pkl')
     from tensorflow.keras.models import load_model
@@ -474,7 +515,7 @@ print("\nSaved: models/predict_function.pkl")
 
 
 # Final Summary
-print("Training Complete!")
+print("Training Complete.")
 
 print(f"\nFinal Results:")
 print(f"  Binary Detection Accuracy: {binary_accuracy:.2%}")
