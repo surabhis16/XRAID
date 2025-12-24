@@ -180,3 +180,11 @@ async def get_confidence_distribution(db: Session = Depends(get_db)):
         'counts': counts,
         'total': len(confidences)
     }
+
+@router.get("/database/info")
+async def database_info(db: Session = Depends(get_db)):
+    from app.db_utils import get_database_statistics, get_table_sizes
+    return {
+        'statistics': get_database_statistics(db),
+        'table_sizes': get_table_sizes(db)
+    }

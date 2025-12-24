@@ -121,7 +121,7 @@ async def upload_csv(
         # Remove duplicate columns (CICIDS has duplicate "Fwd Header Length")
         duplicate_cols = df.columns[df.columns.duplicated()].tolist()
         if duplicate_cols:
-            print(f"\n⚠️  Found duplicate columns: {duplicate_cols}")
+            print(f"\nFound duplicate columns: {duplicate_cols}")
             df = df.loc[:, ~df.columns.duplicated()]
             print(f"✓ Removed duplicates, new shape: {df.shape}")
         

@@ -208,7 +208,7 @@ export default function AnalyticsPage() {
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                         className="dashboard-card bg-card/40 backdrop-blur-xl border border-border/50 rounded-2xl p-6 shadow-2xl"
                     >
-                        <h3 className="text-xl font-bold mb-6 tracking-tight">Attack Distribution</h3>
+                        <h3 className="text-xl font-bold mb-6 tracking-tight">Network Flow Distribution</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
                                 <Pie data={attackDistributionData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value">
