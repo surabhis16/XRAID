@@ -70,13 +70,24 @@ export default function DashboardPage() {
     }
   }
 
+  const attackColors: Record<string, string> = {
+    "Botnet": "#F59E0B",
+    "BruteForce": "#F97316",
+    "DDoS": "#EF4444",
+    "DoS": "#F43F5E",
+    "Exploit": "#8B5CF6",
+    "Infiltration": "#D946EF",
+    "PortScan": "#06B6D4",
+    "WebAttack": "#EC4899",
+  };
+
   const attackDistribution = stats ? Object.entries(stats.attack_distribution)
     .filter(([name]) => name !== "Benign")
     .map(([name, value]) => ({
       name,
       value,
-      color: name === "DDoS" ? "#10B981" : name === "DoS" ? "#06B6D4" : name === "PortScan" ? "#22D3EE" : name === "Botnet" ? "#FBBF24" : "#EF4444"
-    })) : []
+      color: attackColors[name] || "#64748B"
+    })) : [];
 
   const totalAttacks = attackDistribution.reduce((sum, item) => sum + item.value, 0)
   const attackDistributionWithPercent = attackDistribution.map(item => ({

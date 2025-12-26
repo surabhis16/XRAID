@@ -134,11 +134,23 @@ export default function AnalyticsPage() {
         )
     }
 
+    const attackColors: Record<string, string> = {
+        "Benign": "#10B981",
+        "Botnet": "#F59E0B",
+        "BruteForce": "#F97316",
+        "DDoS": "#EF4444",
+        "DoS": "#F43F5E",
+        "Exploit": "#8B5CF6",
+        "Infiltration": "#D946EF",
+        "PortScan": "#06B6D4",
+        "WebAttack": "#EC4899",
+    };
+
     const attackDistributionData = Object.entries(stats.attack_distribution).map(([name, value]) => ({
         name,
         value: value as number,
-        color: name === "Benign" ? "#10B981" : name === "DDoS" ? "#06B6D4" : "#EF4444"
-    }))
+        color: attackColors[name] || "#64748B"
+    }));
 
     const confidenceChartData = confidenceDistribution?.bins.map((bin, index) => ({
         range: bin,

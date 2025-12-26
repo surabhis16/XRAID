@@ -1,4 +1,3 @@
-# SHAP explanation utilities 
 import numpy as np
 from typing import Dict, Any
 from app.utils.model_loader import model_manager
@@ -14,9 +13,11 @@ def preprocess_features(raw_features: np.ndarray) -> np.ndarray:
     
     return features
 
+
 def predict_with_ensemble(features: np.ndarray) -> Dict[str, Any]:
-    """Run ensemble prediction"""
-    # Binary predictions
+    """Trust multiclass classifier"""
+    
+    # Get all model predictions
     rf_pred = model_manager.rf_binary.predict(features)[0]
     rf_proba = model_manager.rf_binary.predict_proba(features)[0, 1]
     
@@ -27,40 +28,39 @@ def predict_with_ensemble(features: np.ndarray) -> Dict[str, Any]:
     ae_error = float(np.mean((features - ae_reconstruction) ** 2))
     ae_pred_binary = 1 if ae_error > model_manager.ae_threshold else 0
     
-    # Adaptive ensemble logic
-    rf_if_agree_anomaly = (rf_pred == 1) and (iso_pred_binary == 1)
-    rf_very_confident = rf_proba > 0.9
-    ae_only_detection = (ae_pred_binary == 1) and (rf_pred == 0) and (iso_pred_binary == 0)
-    ae_very_confident = ae_error > (model_manager.ae_threshold * 1.2)
-    ae_confident_detection = ae_only_detection and ae_very_confident
+    # Get multiclass prediction
+    attack_type_encoded = model_manager.rf_multiclass.predict(features)[0]
+    attack_type_proba = model_manager.rf_multiclass.predict_proba(features)[0]
+    attack_type = model_manager.label_encoder.inverse_transform([attack_type_encoded])[0]
+    type_confidence = float(attack_type_proba[attack_type_encoded])
     
-    is_attack = int(rf_if_agree_anomaly or rf_very_confident or ae_confident_detection)
-    
-    # Multi-class prediction (only if attack detected)
-    attack_type = 'Benign'
-    type_confidence = 0.0
-    
-    if is_attack == 1:
-        attack_type_encoded = model_manager.rf_multiclass.predict(features)[0]
-        attack_type_proba = model_manager.rf_multiclass.predict_proba(features)[0]
-        attack_type = model_manager.label_encoder.inverse_transform([attack_type_encoded])[0]
-        type_confidence = float(attack_type_proba[attack_type_encoded])
-        
-        # Debug prediction with all probabilities
-        print(f"      Binary: {rf_pred}, RF Proba: {rf_proba:.3f}, ISO: {iso_pred_binary}, AE: {ae_pred_binary}")
-        print(f"      Predicted Attack Type: {attack_type} (confidence: {type_confidence:.3f})")
-        print(f"      All class probabilities:")
-        for i, (cls, prob) in enumerate(zip(model_manager.label_encoder.classes_, attack_type_proba)):
-            if prob > 0.01:  # Only show if >1% probability
-                print(f"         {cls}: {prob:.3f}")
-    
-    # Final result
-    if is_attack == 1 and attack_type != 'Benign':
+    # If multiclass says attack with >35% confidence, trust it
+    if attack_type != 'Benign' and type_confidence > 0.35:
+        is_attack = 1
         final_prediction = attack_type
-        final_confidence = float(min(rf_proba, type_confidence))
+        final_confidence = type_confidence
+    # Or if binary models are very confident
+    elif rf_proba > 0.7 or (rf_proba > 0.5 and iso_pred_binary == 1):
+        is_attack = 1
+        final_prediction = attack_type if attack_type != 'Benign' else 'Other'
+        final_confidence = rf_proba
     else:
+        is_attack = 0
         final_prediction = 'Benign'
-        final_confidence = float(1.0 - rf_proba) if is_attack == 0 else type_confidence
+        final_confidence = 1.0 - rf_proba
+    
+    # Debug output for attacks
+    if is_attack == 1:
+        print(f"      Binary: RF={rf_proba:.3f}, ISO={iso_pred_binary}, AE={ae_pred_binary}")
+        print(f"      Multiclass: {attack_type} ({type_confidence:.3f})")
+        print(f"      Top 3 predictions:")
+        
+        # Show top 3 attack types
+        top_3_idx = attack_type_proba.argsort()[-3:][::-1]
+        for idx in top_3_idx:
+            cls = model_manager.label_encoder.inverse_transform([idx])[0]
+            prob = attack_type_proba[idx]
+            print(f"         {cls}: {prob:.3f}")
     
     return {
         'prediction': 'Attack' if is_attack == 1 else 'Benign',
