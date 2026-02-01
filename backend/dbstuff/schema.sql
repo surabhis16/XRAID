@@ -18,8 +18,8 @@ ALTER DATABASE xraid OWNER TO xraid_user;
 
 CREATE TABLE alerts (
     alert_id SERIAL PRIMARY KEY,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     prediction VARCHAR(50) NOT NULL,
     attack_type VARCHAR(50) NOT NULL,
     confidence FLOAT NOT NULL,
@@ -66,6 +66,8 @@ CREATE TABLE alerts (
     )
 );
 
+ALTER TABLE alerts ALTER COLUMN timestamp SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE alerts ALTER COLUMN updated_at SET DEFAULT CURRENT_TIMESTAMP;
 
 CREATE TABLE network_flows (
     flow_id SERIAL PRIMARY KEY,
@@ -100,6 +102,16 @@ CREATE TABLE shap_explanations (
         FOREIGN KEY (alert_id)
         REFERENCES alerts(alert_id)
         ON DELETE CASCADE
+);
+
+CREATE TABLE alert_audit_log (
+    audit_id SERIAL PRIMARY KEY,
+    alert_id INTEGER NOT NULL,
+    old_status VARCHAR(20),
+    new_status VARCHAR(20),
+    changed_by VARCHAR(100),
+    changed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    action VARCHAR(20) NOT NULL
 );
 
 
