@@ -84,7 +84,7 @@ async def update_alert_status(
     status: str,
     db: Session = Depends(get_db)
 ):
-    """Update alert status (unreviewed, investigating, confirmed, false_positive, resolved)"""
+    """Update alert status"""
     valid_statuses = ["unreviewed", "investigating", "confirmed", "false_positive", "resolved"]
     
     if status not in valid_statuses:
@@ -97,7 +97,13 @@ async def update_alert_status(
     if not alert:
         raise HTTPException(status_code=404, detail="Alert not found")
     
+    # add reviewed_by and reviewed_at when changing status
     alert.status = status
+    if status != 'unreviewed':
+        from datetime import datetime
+        alert.reviewed_by = 'analyst_user'  # Or get from auth
+        alert.reviewed_at = datetime.timezone.utc()
+    
     db.commit()
     
     return {"status": "updated", "alert_id": alert_id, "new_status": status}
