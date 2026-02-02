@@ -2,7 +2,7 @@
 
 CREATE DATABASE xraid;
 
-CREATE USER xraid_user WITH PASSWORD 'xraid_secure_pass';
+CREATE USER xraid_user WITH PASSWORD ''; -- insert wtv password
 GRANT ALL PRIVILEGES ON DATABASE xraid TO xraid_user;
 GRANT ALL ON SCHEMA public TO xraid_user;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO xraid_user;
@@ -18,8 +18,8 @@ ALTER DATABASE xraid OWNER TO xraid_user;
 
 CREATE TABLE alerts (
     alert_id SERIAL PRIMARY KEY,
-    timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,  
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     prediction VARCHAR(50) NOT NULL,
     attack_type VARCHAR(50) NOT NULL,
     confidence FLOAT NOT NULL,
@@ -65,9 +65,6 @@ CREATE TABLE alerts (
         OR (reviewed_by IS NOT NULL AND reviewed_at IS NOT NULL)
     )
 );
-
-ALTER TABLE alerts ALTER COLUMN timestamp SET DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE alerts ALTER COLUMN updated_at SET DEFAULT CURRENT_TIMESTAMP;
 
 CREATE TABLE network_flows (
     flow_id SERIAL PRIMARY KEY,
@@ -139,7 +136,7 @@ CREATE INDEX idx_shap_values ON shap_explanations USING GIN(shap_values);
 CREATE INDEX idx_shap_top_features ON shap_explanations USING GIN(top_features);
 
 
--- 4. DDL - comments (just for documentation)
+-- 4. DDL - comments (documentation)
 
 COMMENT ON TABLE alerts IS 'Main alerts table storing network intrusion detection results';
 COMMENT ON COLUMN alerts.confidence IS 'Final ensemble confidence score (0.0-1.0)';

@@ -106,3 +106,14 @@ export async function updateAlertStatus(alertId: number, status: string) {
     return response.json();
 }
 
+// Delete alerts fn
+export async function deleteAlert(alertId: number): Promise<void> {
+    const response = await fetch(`${API_URL}/api/alerts/${alertId}`, {
+        method: 'DELETE',
+    })
+
+    if (!response.ok) {
+        throw new Error('Failed to delete alert')
+    }
+}
+

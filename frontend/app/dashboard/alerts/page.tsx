@@ -1,15 +1,17 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { AlertCircle, Eye, ArrowLeft } from "lucide-react"
+import { AlertCircle, Eye, ArrowLeft, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { getAlerts, type Alert } from "@/lib/api"
+import { getAlerts, type Alert, deleteAlert } from "@/lib/api"
+
 
 export default function AlertsPage() {
     const [alerts, setAlerts] = useState<Alert[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
 
     useEffect(() => {
         loadAlerts()
@@ -25,6 +27,16 @@ export default function AlertsPage() {
             setError(err.message)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleDelete = async (alertId: number) => {
+        try {
+            await deleteAlert(alertId)
+            setDeleteConfirm(null)
+            await loadAlerts()
+        } catch (err: any) {
+            setError(`Failed to delete alert: ${err.message}`)
         }
     }
 
@@ -119,18 +131,54 @@ export default function AlertsPage() {
                                                 </span>
                                             </td>
                                             <td className="py-4 px-6 text-right">
-                                                <Link
-                                                    href={`/dashboard/alerts/${alert.alert_id}`}
-                                                    className="p-2 border border-white/10 rounded-xl group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-xl inline-block"
-                                                >
-                                                    <Eye className="w-5 h-5" />
-                                                </Link>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Link
+                                                        href={`/dashboard/alerts/${alert.alert_id}`}
+                                                        className="p-2 border border-white/10 rounded-xl group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-xl inline-block"
+                                                    >
+                                                        <Eye className="w-5 h-5" />
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => setDeleteConfirm(alert.alert_id)}
+                                                        className="p-2 border border-red-500/30 rounded-xl hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-xl"
+                                                    >
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </motion.tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                )}
+                {deleteConfirm && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="bg-black/70 border border-destructive/50 rounded-2xl p-6 max-w-md shadow-2xl"
+                        >
+                            <h3 className="text-xl font-bold mb-3 text-destructive">Confirm Deletion</h3>
+                            <p className="text-sm text-slate-300 mb-6">
+                                Are you sure you want to delete Alert #{deleteConfirm}? This action cannot be undone.
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => handleDelete(deleteConfirm)}
+                                    className="flex-1 px-4 py-2 bg-destructive hover:opacity-90 text-white rounded-lg font-bold transition-opacity"
+                                >
+                                    Delete
+                                </button>
+                                <button
+                                    onClick={() => setDeleteConfirm(null)}
+                                    className="flex-1 px-4 py-2 border border-white/10 hover:bg-white/5 text-white rounded-lg font-bold transition-all"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </motion.div>
                     </div>
                 )}
             </main>
