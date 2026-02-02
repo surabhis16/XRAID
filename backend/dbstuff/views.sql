@@ -59,9 +59,11 @@ SELECT
     ROUND(AVG(confidence)::NUMERIC, 4) AS avg_confidence,
     ROUND(MAX(confidence)::NUMERIC, 4) AS max_confidence,
     ROUND(AVG(severity_score)::NUMERIC, 2) AS avg_severity,
-    COUNT(CASE WHEN status = 'unreviewed' THEN 1 END) AS unreviewed_count,
-    COUNT(CASE WHEN status = 'investigating' THEN 1 END) AS investigating_count,
-    COUNT(CASE WHEN status = 'resolved' THEN 1 END) AS resolved_count
+    COUNT(CASE WHEN status = 'unreviewed' THEN 1 END) as unreviewed_count,
+    COUNT(CASE WHEN status = 'investigating' THEN 1 END) as investigating_count,
+    COUNT(CASE WHEN status = 'resolved' THEN 1 END) as resolved_count,
+    COUNT(CASE WHEN status = 'false_positive' THEN 1 END) as false_positive_count,
+    COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed_count
 FROM alerts
 WHERE prediction = 'Attack'
   AND timestamp >= CURRENT_DATE - INTERVAL '30 days'
