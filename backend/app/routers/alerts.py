@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.database import get_db
 from app.models import Alert, NetworkFlow, ShapExplanation
@@ -100,32 +100,13 @@ async def update_alert_status(
     # add reviewed_by and reviewed_at when changing status
     alert.status = status
     if status != 'unreviewed':
-        from datetime import datetime
-        alert.reviewed_by = 'analyst_user'  # Or get from auth
-        alert.reviewed_at = datetime.timezone.utc()
+        from datetime import datetime, timezone
+        alert.reviewed_by = 'analyst_user' 
+        alert.reviewed_at = datetime.now(timezone.utc)  
     
     db.commit()
     
     return {"status": "updated", "alert_id": alert_id, "new_status": status}
-
-@router.delete("/alerts/{alert_id}")
-async def delete_alert(alert_id: int, db: Session = Depends(get_db)):
-    """Delete an alert and associated data"""
-    # Delete SHAP explanation
-    db.query(ShapExplanation).filter(ShapExplanation.alert_id == alert_id).delete()
-    
-    # Delete network flow
-    db.query(NetworkFlow).filter(NetworkFlow.alert_id == alert_id).delete()
-    
-    # Delete alert
-    alert = db.query(Alert).filter(Alert.alert_id == alert_id).first()
-    if not alert:
-        raise HTTPException(status_code=404, detail="Alert not found")
-    
-    db.delete(alert)
-    db.commit()
-    
-    return {"status": "deleted", "alert_id": alert_id}
 
 @router.get("/alerts/search/by-confidence")
 async def search_by_confidence(
