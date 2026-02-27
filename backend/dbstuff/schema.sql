@@ -111,6 +111,19 @@ CREATE TABLE alert_audit_log (
     action VARCHAR(20) NOT NULL
 );
 
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100),
+    role VARCHAR(20) NOT NULL DEFAULT 'analyst',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMPTZ,
+    CONSTRAINT check_role_valid CHECK (role IN ('admin', 'analyst', 'viewer'))
+);
+
+CREATE INDEX idx_users_email ON users(email);
 
 -- 3. DDL - index creation
 

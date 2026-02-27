@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 from app.utils.model_loader import model_manager
-from app.routers import predictions, alerts, stats
+from app.routers import predictions, alerts, stats, auth
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -35,6 +35,7 @@ async def root():
     }
 
 # Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(predictions.router, prefix="/api", tags=["predictions"])
 app.include_router(alerts.router, prefix="/api", tags=["alerts"])
 app.include_router(stats.router, prefix="/api", tags=["stats"])

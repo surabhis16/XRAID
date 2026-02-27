@@ -6,6 +6,7 @@ import { Eye, EyeOff, Mail, Lock, Shield, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { login } from "@/lib/api"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -13,10 +14,29 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    router.push("/dashboard")
+    setError("")
+    setLoading(true)
+
+    try {
+      const response = await login(email, password)
+
+      if (rememberMe) {
+        localStorage.setItem('xraid_token', response.access_token)
+      } else {
+        sessionStorage.setItem('xraid_token', response.access_token)
+      }
+
+      router.push("/dashboard")
+    } catch (err: any) {
+      setError(err.message || "Login failed")
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleDemoMode = () => {
@@ -91,6 +111,11 @@ export default function LoginPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-2 ml-1 font-bold">Identity</label>
               <div className="relative group">
@@ -157,7 +182,7 @@ export default function LoginPage() {
               whileTap={{ scale: 0.99 }}
               className="w-full py-4 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:shadow-xl hover:shadow-primary/30 transition-all"
             >
-              Start Session
+              {loading ? "Authenticating..." : "Start Session"}
             </motion.button>
 
             <motion.button
