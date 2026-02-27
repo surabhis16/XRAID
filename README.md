@@ -33,6 +33,10 @@
 
 Unsupervised models underperform in standalone binary classification but provide complementary anomaly signals that improve ensemble robustness.
 
+## Authentication
+
+Secure JWT-based authentication with bcrypt password hashing. User roles: `admin`, `analyst`, `viewer`.
+
 ## Model Training
 
 **Dataset:** CICIDS2017 (2.83M flows, 78 features, 9 attack types)  
@@ -42,7 +46,7 @@ Unsupervised models underperform in standalone binary classification but provide
 ## Database Schema
 
 ### Core Tables
-
+- **users** : Authentication and user management
 - **alerts** : Central hub storing all detection events (prediction, confidence, status, severity)
 - **network_flows** : Raw 78-feature CICIDS2017 flow data (JSONB)
 - **shap_explanations** : SHAP values, top features, natural-language summary (JSONB)
@@ -94,6 +98,7 @@ For each alert, XRAID computes:
 - TensorFlow + Keras (Autoencoder)
 - scikit-learn (RF, IF, preprocessing)
 - SHAP (explainability)
+- JWT + bcrypt (authentication)
 
 **Frontend:**
 - Next.js 13 
