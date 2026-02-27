@@ -35,11 +35,6 @@ Unsupervised models underperform in standalone binary classification but provide
 
 ## Model Training
 
-```bash
-cd backend
-python training.py
-```
-
 **Dataset:** CICIDS2017 (2.83M flows, 78 features, 9 attack types)  
 **Models Generated:** RF (binary + multi-class), Isolation Forest, Autoencoder
 
