@@ -15,79 +15,10 @@
 
 ## System Architecture
 
-```mermaid
----
-config:
-  theme: default
-  themeVariables:
-    primaryColor: '#4A90E2'
-    primaryTextColor: '#fff'
-    primaryBorderColor: '#2E5C8A'
-    lineColor: '#5C7CFA'
-    secondaryColor: '#82C0CC'
-    tertiaryColor: '#F4A261'
-    background: '#F8F9FA'
-    mainBkg: '#FFFFFF'
-    secondBkg: '#E8F4F8'
----
-flowchart TB
- subgraph subGraph0["<b>Data Ingestion</b>"]
-        B["FastAPI Backend"]
-        A["Network Traffic<br>CICIDS2017"]
-        C["Feature Engineering<br>78 Features"]
-  end
- subgraph subGraph1["<b>ML Pipeline</b>"]
-        D["Random Forest<br>Binary Classifier"]
-        E["Isolation Forest<br>Anomaly Detector"]
-        F["Autoencoder<br>Reconstruction"]
-        G{"Adaptive<br>Ensemble<br>Logic"}
-        H["Multi-Class RF<br>9 Attack Types"]
-        I["Label: Benign"]
-  end
- subgraph subGraph2["<b>Explainability Layer</b>"]
-        J["SHAP TreeExplainer<br>Feature Attribution"]
-        K["Top 5 Features<br>+ Summary"]
-  end
- subgraph subGraph3["<b>Persistence Layer</b>"]
-        L[("PostgreSQL")]
-        M["alerts"]
-        N["network_flows"]
-        O["shap_explanations"]
-        P["alert_audit_log"]
-        Q["Auto Severity<br>Calculation"]
-        R["Audit Trail<br>Logging"]
-        S["Dashboard<br>Aggregations"]
-  end
- subgraph Frontend["<b>Frontend</b>"]
-        T["Next.js Dashboard"]
-        U["Alert Management & Analytics"]
-        W["SHAP<br>Visualizations"]
-  end
-    A -- CSV Upload --> B
-    B -- Preprocess --> C
-    C --> D & E & F
-    D -- "P_RF > 0.9" --> G
-    E -- Anomaly Score --> G
-    F -- Reconstruction<br>Error &gt; τ --> G
-    G -- Attack Detected --> H
-    G -- Benign --> I
-    H --> J
-    J --> K
-    K --> L
-    I --> L
-    L -- Tables --> M & N & O & P
-    L -- Triggers --> Q & R
-    L -- Views --> S
-    S --> T
-    T --> U & W
-
-    style B fill:#4A90E2,stroke:#2E5C8A,stroke-width:3px,color:#fff
-    style A fill:#E8F4F8,stroke:#4A90E2,stroke-width:2px
-    style G fill:#F4A261,stroke:#E07A3C,stroke-width:3px,color:#fff
-    style J fill:#82C0CC,stroke:#5C9EA6,stroke-width:3px,color:#fff
-    style L fill:#5C7CFA,stroke:#3B5BDB,stroke-width:3px,color:#fff
-    style T fill:#37B679,stroke:#2D9561,stroke-width:3px,color:#fff
-```
+<img src="frontend/public/arch-diag.svg" 
+     alt="XRAID Architecture" 
+     width="550" 
+  height="700"/>
 
 ## Performance Metrics
 
@@ -155,9 +86,9 @@ else:
 
 For each alert, XRAID computes:
 
-1. **SHAP values** — Contribution of each of the 78 features to the prediction
-2. **Top 5 features** — Ranked by absolute SHAP value with feature values
-3. **Natural-language summary** — Human-readable explanation of the detection
+1. **SHAP values** - Contribution of each of the 78 features to the prediction
+2. **Top 5 features** - Ranked by absolute SHAP value with feature values
+3. **Natural-language summary** - Human-readable explanation of the detection
 
 ## Tech Stack
 
