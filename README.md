@@ -100,6 +100,8 @@ flowchart TB
 
 **Multi-Class Accuracy:** 99.55% across 9 attack categories
 
+Unsupervised models underperform in standalone binary classification but provide complementary anomaly signals that improve ensemble robustness.
+
 ## Model Training
 
 ```bash
