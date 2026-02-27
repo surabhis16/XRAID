@@ -9,6 +9,7 @@
 - **99.57% Binary Accuracy** - Validated on CICIDS2017 with 100% precision and ROC-AUC of 0.9898
 - **Multi-Class Categorization** - Identifies 9 attack types: DDoS, DoS, PortScan, BruteForce, WebAttack, Botnet, Infiltration, Exploit
 - **SHAP Explainability** - Per-alert feature attributions for model transparency and analyst trust
+- **JWT Authentication** — Secure token-based auth with role-based access control
 - **Production-Ready Backend** - FastAPI + PostgreSQL with triggers, constraints, audit logs, and pre-built views
 - **Real-Time Dashboard** - Next.js frontend with time-series analytics, alert management, and SHAP visualizations
 
