@@ -21,7 +21,7 @@ export function LandingHeader() {
           </div>
           <div className="flex flex-col">
             <h1 className="text-2xl font-black tracking-tighter leading-none">
-              XRAID
+              Cryptographic Network Defense
             </h1>
             <div className="flex items-center gap-1.5 mt-1">
               <span className="relative flex h-1.5 w-1.5">

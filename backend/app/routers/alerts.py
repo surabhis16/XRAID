@@ -131,3 +131,15 @@ async def search_by_confidence(
         source_ip=a.source_ip,
         destination_ip=a.destination_ip
     ) for a in alerts]
+
+@router.delete("/alerts/{alert_id}")
+async def delete_alert(alert_id: int, db: Session = Depends(get_db)):
+    """Delete an alert and its associated flow and SHAP data"""
+    alert = db.query(Alert).filter(Alert.alert_id == alert_id).first()
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    
+    db.delete(alert)
+    db.commit()
+    
+    return {"status": "deleted", "alert_id": alert_id}

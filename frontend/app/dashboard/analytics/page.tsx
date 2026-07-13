@@ -181,7 +181,7 @@ export default function AnalyticsPage() {
 
                 {/* PDF Report Header */}
                 <div className="hidden print:block mb-10 border-b border-slate-200 pb-8">
-                    <h1 className="text-4xl font-black tracking-tighter text-slate-900">XRAID SECURITY REPORT</h1>
+                    <h1 className="text-4xl font-black tracking-tighter text-slate-900">SECURITY REPORT</h1>
                     <p className="text-slate-500 font-mono mt-2">GENERATED: {new Date().toLocaleString()}</p>
                 </div>
 

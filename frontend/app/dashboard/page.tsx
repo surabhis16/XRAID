@@ -282,7 +282,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
         <div className="p-8 h-full flex flex-col">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h1 className="text-3xl font-black tracking-tighter">XRAID</h1>
+              <h1 className="text-3xl font-black tracking-tighter">Cryptographic Network Defense</h1>
               <p className="text-[10px] font-mono uppercase tracking-widest text-primary mt-1">Trust Through Transparency</p>
             </div>
             <button onClick={onClose} className="lg:hidden p-2 text-muted-foreground"><X className="w-5 h-5" /></button>
