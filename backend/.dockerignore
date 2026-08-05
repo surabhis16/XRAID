@@ -1,0 +1,16 @@
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+*.db
+.DS_Store
+models/
+*.pkl
+*.keras
+*.h5
+.git
+.gitignore
