@@ -12,6 +12,7 @@
 - **JWT Authentication** - Secure token-based auth with role-based access control
 - **Backend** - FastAPI + PostgreSQL with triggers, constraints, audit logs, and pre-built views
 - **Real-Time Dashboard** - Next.js frontend with time-series analytics, alert management, and SHAP visualizations
+- **Dockerized** - single `docker-compose up` spins up backend, frontend, and PostgreSQL
 
 
 ## System Architecture
@@ -95,7 +96,7 @@ For each alert, XRAID computes:
 **Backend:**
 - FastAPI (async API)
 - PostgreSQL (relational persistence)
-- SQLAlchemy + Alembic (ORM + migrations)
+- SQLAlchemy (ORM)
 - TensorFlow + Keras (Autoencoder)
 - scikit-learn (RF, IF, preprocessing)
 - SHAP (explainability)
@@ -107,6 +108,25 @@ For each alert, XRAID computes:
 - Tailwind CSS
 - shadcn/ui
 - Framer Motion
+
+## Setup
+
+1. Create `.env` at project root (see `.env.example`)
+2. Add trained models under `backend/models/` : [download here](https://drive.google.com/drive/folders/1DYA90RZMMuEFJLGNJPhFmxzdZ6WTMk5-?usp=drive_link)
+3. Run:
+```bash
+   docker-compose up --build
+```
+
+| Service | URL |
+|---------|-----|
+| Frontend | localhost:3000 |
+| Dashboard | localhost:3000/dashboard |
+| API | localhost:8000 |
+| API Docs | localhost:8000/docs |
+
+Default login: `admin@xraid.io` / `admin123` (for local dev only)
+
 
 ## License
 
