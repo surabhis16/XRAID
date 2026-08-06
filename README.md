@@ -9,7 +9,7 @@
 - **99.57% Binary Accuracy** - Validated on CICIDS2017 with 100% precision and ROC-AUC of 0.9898
 - **Multi-Class Categorization** - Identifies 9 attack types: DDoS, DoS, PortScan, BruteForce, WebAttack, Botnet, Infiltration, Exploit
 - **SHAP Explainability** - Per-alert feature attributions for model transparency and analyst trust
-- **JWT Authentication** - Secure token-based auth with role-based access control
+- **JWT Authentication** — Token-based auth with bcrypt hashing, RBAC roles, rate limiting, and protected routes
 - **Backend** - FastAPI + PostgreSQL with triggers, constraints, audit logs, and pre-built views
 - **Real-Time Dashboard** - Next.js frontend with time-series analytics, alert management, and SHAP visualizations
 - **Dockerized** - single `docker-compose up` spins up backend, frontend, and PostgreSQL
@@ -38,6 +38,10 @@ Unsupervised models underperform in standalone binary classification but provide
 ## Authentication
 
 Secure JWT-based authentication with bcrypt password hashing. User roles: `admin`, `analyst`, `viewer`.
+
+- JWT payload includes `sub` (email) and `role`
+- `reviewed_by` field on alerts is automatically populated from the authenticated user's email on status updates
+- Rate limited to 5 login attempts per minute per IP
 
 ## Model Training
 
