@@ -9,6 +9,9 @@ from typing import Optional
 import os
 from dotenv import load_dotenv
 from app.database import get_db
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from fastapi import Request
 
 load_dotenv()
 
@@ -20,6 +23,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+limiter = Limiter(key_func=get_remote_address)
 
 class Token(BaseModel):
     access_token: str
@@ -55,7 +59,8 @@ def authenticate_user(db: Session, email: str, password: str):
     return user
 
 @router.post("/login", response_model=Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@limiter.limit("5/minute")  # 5 attempts per minute per IP
+async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect email or password")

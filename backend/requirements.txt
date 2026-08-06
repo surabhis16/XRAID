@@ -16,3 +16,5 @@ scipy==1.16.3
 SQLAlchemy==2.0.45
 psycopg2-binary  
 dill             
+
+slowapi==0.1.10

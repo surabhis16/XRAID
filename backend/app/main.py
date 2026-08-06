@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 from app.utils.model_loader import model_manager
 from app.routers import predictions, alerts, stats, auth
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
+limiter = Limiter(key_func=get_remote_address)
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -12,6 +17,9 @@ app = FastAPI(
     description="Explainable Robust Adaptive Intrusion Detection System",
     version="1.0.0"
 )
+# rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS for Next.js
 app.add_middleware(
