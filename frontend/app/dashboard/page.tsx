@@ -281,7 +281,8 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
 
   const handleLogout = () => {
     localStorage.removeItem('xraid_token')
-    sessionStorage.removeItem('xraid_token')
+    localStorage.removeItem('xraid_user')
+    document.cookie = 'xraid_token=; path=/; max-age=0'
     router.push('/login')
   }
 

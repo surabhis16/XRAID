@@ -25,11 +25,18 @@ export default function LoginPage() {
     try {
       const response = await login(email, password)
 
+      // Store in localStorage (for api.ts)
+      localStorage.setItem('xraid_token', response.access_token)
       if (rememberMe) {
-        localStorage.setItem('xraid_token', response.access_token)
-      } else {
-        sessionStorage.setItem('xraid_token', response.access_token)
+        localStorage.setItem('xraid_user', JSON.stringify(response.user))
       }
+
+      // Store in cookie (for middleware)
+      const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24  // 30 days or 1 day
+      document.cookie = `xraid_token=${response.access_token}; path=/; max-age=${maxAge}`
+
+      // REMEMBER ME (stay authorized) Unchecked: cookie lasts 1 day, localStorage forever
+      // Checked: cookie lasts 30 days, localStorage forever
 
       router.push("/dashboard")
     } catch (err: any) {
