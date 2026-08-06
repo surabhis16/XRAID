@@ -11,6 +11,7 @@ import {
   Shield,
   Activity,
   Eye,
+  LogOut
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
@@ -18,6 +19,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { getStats, getAlerts, getAlertDetail, updateAlertStatus } from "@/lib/api"
 import type { Stats, Alert, AlertDetail } from "@/lib/api"
+import { useRouter } from "next/navigation"
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -267,6 +269,8 @@ export default function DashboardPage() {
 
 // Sub-components: Sidebar and StatCard
 function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const router = useRouter()
+
   const navItems = [
     { icon: <Home className="w-5 h-5" />, label: "Dashboard", href: "/dashboard", active: true },
     { icon: <AlertCircle className="w-5 h-5" />, label: "Alerts", href: "/dashboard/alerts" },
@@ -275,6 +279,12 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
     { icon: <Settings className="w-5 h-5" />, label: "Settings", href: "/dashboard/settings" },
   ]
 
+  const handleLogout = () => {
+    localStorage.removeItem('xraid_token')
+    sessionStorage.removeItem('xraid_token')
+    router.push('/login')
+  }
+
   return (
     <>
       {isOpen && <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 lg:hidden" onClick={onClose} />}
@@ -282,11 +292,12 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
         <div className="p-8 h-full flex flex-col">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h1 className="text-3xl font-black tracking-tighter">Cryptographic Network Defense</h1>
+              <h1 className="text-3xl font-black tracking-tighter">XRAID</h1>
               <p className="text-[10px] font-mono uppercase tracking-widest text-primary mt-1">Trust Through Transparency</p>
             </div>
             <button onClick={onClose} className="lg:hidden p-2 text-muted-foreground"><X className="w-5 h-5" /></button>
           </div>
+
           <nav className="space-y-2 flex-1">
             {navItems.map((item) => (
               <Link key={item.label} href={item.href} className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all ${item.active ? "bg-primary text-white font-bold shadow-lg shadow-primary/20" : "text-muted-foreground hover:bg-secondary/10 hover:text-foreground"}`}>
@@ -294,6 +305,14 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
               </Link>
             ))}
           </nav>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-4 px-5 py-4 rounded-2xl text-muted-foreground hover:bg-red-500/10 hover:text-red-400 transition-all w-full mt-4"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="text-sm tracking-tight">Logout</span>
+          </button>
         </div>
       </aside>
     </>

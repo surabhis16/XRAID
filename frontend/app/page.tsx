@@ -67,8 +67,8 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-none mb-2 bg-clip-text text-transparent bg-linear-to-b from-foreground to-foreground/40">
-              Cryptographic Network Defense
+            <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter leading-none mb-2 bg-clip-text text-transparent bg-linear-to-b from-foreground to-foreground/40">
+              XRAID
             </h1>
             <p className="text-primary font-mono text-sm md:text-base tracking-[0.4em] uppercase mb-12">
               Trust Through Transparency
@@ -208,7 +208,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="py-16 px-4 border-t border-white/5 bg-background">
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-6 text-center">
-          <div className="text-2xl font-black tracking-tighter">Cryptographic Network Defense</div>
+          <div className="text-2xl font-black tracking-tighter">XRAID</div>
           <p className="text-sm text-muted-foreground max-w-xs">
             Built for security analysts who demand transparency in AI.
           </p>

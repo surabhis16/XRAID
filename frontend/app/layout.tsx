@@ -19,7 +19,7 @@ const jetBrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Cryptographically Secured Network Threat Detection",
+  title: "XRAID",
   description: "eXplainable Robust Adaptive Intrusion Detection - See exactly why every threat was flagged"
 }
 
