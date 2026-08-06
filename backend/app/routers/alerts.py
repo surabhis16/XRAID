@@ -82,31 +82,24 @@ async def get_alert_detail(alert_id: int, db: Session = Depends(get_db)):
 async def update_alert_status(
     alert_id: int,
     status: str,
+    reviewed_by: str = "analyst", 
     db: Session = Depends(get_db)
 ):
-    """Update alert status"""
     valid_statuses = ["unreviewed", "investigating", "confirmed", "false_positive", "resolved"]
-    
     if status not in valid_statuses:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
-        )
+        raise HTTPException(status_code=400, detail=f"Invalid status.")
     
     alert = db.query(Alert).filter(Alert.alert_id == alert_id).first()
     if not alert:
         raise HTTPException(status_code=404, detail="Alert not found")
     
-    # add reviewed_by and reviewed_at when changing status
     alert.status = status
     if status != 'unreviewed':
-        from datetime import datetime, timezone
-        alert.reviewed_by = 'analyst_user' 
-        alert.reviewed_at = datetime.now(timezone.utc)  
+        alert.reviewed_by = reviewed_by 
+        alert.reviewed_at = datetime.now(timezone.utc)
     
     db.commit()
-    
-    return {"status": "updated", "alert_id": alert_id, "new_status": status}
+    return {"status": "updated", "alert_id": alert_id, "new_status": status, "reviewed_by": reviewed_by}
 
 @router.get("/alerts/search/by-confidence")
 async def search_by_confidence(

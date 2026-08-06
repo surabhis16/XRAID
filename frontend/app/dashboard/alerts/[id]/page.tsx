@@ -7,6 +7,17 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { getAlertDetail, updateAlertStatus, type AlertDetail } from "@/lib/api"
 
+function getEmailFromToken(): string {
+    const token = localStorage.getItem('xraid_token')
+    if (!token) return 'unknown'
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]))
+        return payload.sub  // email is stored as 'sub' in JWT
+    } catch {
+        return 'unknown'
+    }
+}
+
 export default function AlertDetailsPage() {
     const params = useParams()
     const router = useRouter()
@@ -31,7 +42,8 @@ export default function AlertDetailsPage() {
     const handleUpdateStatus = async (status: string) => {
         if (!alertData) return
         try {
-            await updateAlertStatus(alertData.alert.alert_id, status)
+            const reviewedBy = getEmailFromToken()
+            await updateAlertStatus(alertData.alert.alert_id, status, reviewedBy)
             router.push('/dashboard/alerts')
         } catch (err: any) {
             console.error("Failed to update status:", err.message)

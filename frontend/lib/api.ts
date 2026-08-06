@@ -123,8 +123,11 @@ export async function getStats(): Promise<Stats> {
 }
 
 // Update alert status
-export async function updateAlertStatus(alertId: number, status: string) {
-    const response = await fetch(`${API_URL}/api/alerts/${alertId}/status?status=${status}`, {
+export async function updateAlertStatus(alertId: number, status: string, reviewedBy?: string) {
+    const params = new URLSearchParams({ status })
+    if (reviewedBy) params.append('reviewed_by', reviewedBy)
+
+    const response = await fetch(`${API_URL}/api/alerts/${alertId}/status?${params}`, {
         method: 'PATCH',
         headers: authHeaders()
     });
